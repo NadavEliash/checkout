@@ -16,7 +16,7 @@ const UserMenu: React.FC = () => {
     <div className="relative">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 text-white hover:text-gray-200 transition-colors"
+        className="flex items-center gap-2 hover:text-gray-900 transition-colors"
       >
         {user.avatar ? (
           <img 
@@ -25,9 +25,9 @@ const UserMenu: React.FC = () => {
             className="w-8 h-8 rounded-full"
           />
         ) : (
-          <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
+          <div className="w-8 h-8 bg-black/20 rounded-full flex items-center justify-center">
             <span className="text-sm font-semibold">
-              {user.name.charAt(0)}
+              {user.name === 'אורח' ? '👤' : user.name.charAt(0)}
             </span>
           </div>
         )}
@@ -48,7 +48,7 @@ const UserMenu: React.FC = () => {
             className="fixed inset-0 z-10" 
             onClick={() => setIsOpen(false)}
           />
-          <div className="absolute left-0 mt-2 w-48 bg-white rounded-lg shadow-lg border z-20">
+          <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border z-20">
             <div className="py-2">
               <div className="px-4 py-2 text-sm text-gray-500 border-b">
                 אורח

@@ -99,7 +99,8 @@ const PriceSelector: React.FC<PriceSelectorProps> = ({
               value={price.amount || ''}
               onChange={(e) => handlePriceChange(index, 'amount', e.target.value)}
               placeholder="מחיר"
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-right"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-right
+              [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
             />
           </div>
           

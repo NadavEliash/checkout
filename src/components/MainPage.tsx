@@ -20,8 +20,8 @@ const MainPage: React.FC = () => {
       <div className="max-w-6xl mx-auto p-5">
         <header className="bg-white/95 p-10 rounded-2xl mb-8 shadow-xl">
           <div className="flex justify-between items-start mb-4">
-            <div></div>
             <UserMenu />
+            <div></div>
           </div>
           <div className="text-center flex justify-center gap-10">
             <div className="flex flex-col">
