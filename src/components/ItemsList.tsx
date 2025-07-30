@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Item } from '../types';
+import PriceDisplay from './PriceDisplay';
 
 interface ItemsListProps {
   items: Item[];
@@ -75,13 +76,12 @@ const ItemsList: React.FC<ItemsListProps> = ({ items, onDeleteItem, onReorderIte
           >
             <div className="flex justify-between items-center mb-3 gap-3">
               <div className="text-xl font-semibold text-gray-700 flex-1">{item.name}</div>
-              <div className="flex flex-col gap-2">
-                {item.prices.map((price, priceIndex) => (
-                  <span key={priceIndex} className="text-xl font-medium">
-                    {price.label ? `${price.label}: ` : ''}{price.amount.toFixed(2)}  ₪
-                  </span>
-                ))}
-              </div>
+              <PriceDisplay 
+                prices={item.prices}
+                currentPrice={item.currentPrice}
+                size="lg"
+                showLabels={true}
+              />
               <button onClick={() => onDeleteItem(item.id)} title="מחק מוצר"
                 className="bg-white/30 border-none p-2 rounded-md cursor-pointer text-base transition-all flex items-center justify-center">
                 <img className="opacity-30 hover:opacity-100" src="/assets/delete.svg" alt="מחק" width={24} />

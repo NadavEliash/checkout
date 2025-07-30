@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { Price } from '../types';
+import PriceSelector from './PriceSelector';
 
 interface ItemFormProps {
-  onAddItem: (name: string, prices: Price[]) => void;
+  onAddItem: (name: string, prices: Price[], currentPrice: number) => void;
 }
 
 interface CheckoutPage {
@@ -17,17 +18,12 @@ interface CheckoutPage {
   userDetails: Record<string, any>;
 }
 
-interface PriceInput {
-  amount: string;
-  label: string;
-}
 
 const ItemForm: React.FC<ItemFormProps> = ({ onAddItem }) => {
   const [itemName, setItemName] = useState('');
   const [itemDescription, setItemDescription] = useState('');
-  const [priceInputs, setPriceInputs] = useState<PriceInput[]>([
-    { amount: '', label: '' }
-  ]);
+  const [prices, setPrices] = useState<Price[]>([{ amount: 0, label: 'מחיר רגיל' }]);
+  const [currentPrice, setCurrentPrice] = useState<number>(0);
   const [nameError, setNameError] = useState('');
   const [priceError, setPriceError] = useState('');
   const [items, setItems] = useState<{
@@ -38,32 +34,6 @@ const ItemForm: React.FC<ItemFormProps> = ({ onAddItem }) => {
     image: string;
   }[]>([]);
 
-  const addPriceInput = (): void => {
-    setPriceInputs(prev => [...prev, { amount: '', label: '' }]);
-  };
-
-  const removePriceInput = (index: number): void => {
-    if (priceInputs.length > 1) {
-      setPriceInputs(prev => prev.filter((_, i) => i !== index));
-    }
-  };
-
-  const updatePriceInput = (index: number, field: keyof PriceInput, value: string): void => {
-    setPriceInputs(prev => 
-      prev.map((price, i) => 
-        i === index ? { ...price, [field]: value } : price
-      )
-    );
-  };
-
-  const collectPrices = (): Price[] => {
-    return priceInputs
-      .filter(input => input.amount && parseFloat(input.amount) > 0)
-      .map((input) => ({
-        amount: parseFloat(input.amount),
-        label: input.label.trim() || ''
-      }));
-  };
 
   const handleSubmit = (e: React.FormEvent): void => {
     e.preventDefault();
@@ -79,9 +49,14 @@ const ItemForm: React.FC<ItemFormProps> = ({ onAddItem }) => {
       hasErrors = true;
     }
     
-    const prices = collectPrices();
-    if (prices.length === 0) {
+    const validPrices = prices.filter(p => p.amount > 0);
+    if (validPrices.length === 0) {
       setPriceError('נדרש לפחות מחיר אחד');
+      hasErrors = true;
+    }
+    
+    if (currentPrice <= 0) {
+      setPriceError('יש לבחור מחיר נוכחי תקין');
       hasErrors = true;
     }
     
@@ -94,17 +69,18 @@ const ItemForm: React.FC<ItemFormProps> = ({ onAddItem }) => {
       id: Date.now().toString(),
       name: itemName,
       description: itemDescription.trim() || undefined,
-      prices: prices,
+      prices: validPrices,
       image: '' // Empty for now
     };
     setItems(prev => [...prev, newItem]);
     
-    onAddItem(itemName, prices);
+    onAddItem(itemName, validPrices, currentPrice);
     
     // Reset form
     setItemName('');
     setItemDescription('');
-    setPriceInputs([{ amount: '', label: '' }]);
+    setPrices([{ amount: 0, label: 'מחיר רגיל' }]);
+    setCurrentPrice(0);
   };
 
   const generateCheckoutPage = (): void => {
@@ -152,49 +128,18 @@ const ItemForm: React.FC<ItemFormProps> = ({ onAddItem }) => {
         </div>
 
         <div className="flex flex-col">
-          <label className="font-semibold mb-2 text-gray-600">מחירים:</label>
-          <div>
-            {priceInputs.map((priceInput, index) => (
-              <div key={index} className="flex gap-3 mb-3 items-center flex-col lg:flex-row">
-                <input
-                  type="number"
-                  placeholder="מחיר"
-                  step="0.01"
-                  min="0"
-                  value={priceInput.amount}
-                  onChange={(e) => {
-                    updatePriceInput(index, 'amount', e.target.value);
-                    if (priceError) setPriceError('');
-                  }}
-                  className="flex-1 p-3 border-2 border-gray-200 rounded-lg text-base transition-colors focus:outline-none focus:border-indigo-500 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                />
-                <input
-                  type="text"
-                  placeholder="תיאור (אופציונלי)"
-                  value={priceInput.label}
-                  onChange={(e) => updatePriceInput(index, 'label', e.target.value)}
-                  className="flex-1 p-3 border-2 border-gray-200 rounded-lg text-base transition-colors focus:outline-none focus:border-indigo-500"
-                />
-                <button
-                  type="button"
-                  onClick={() => removePriceInput(index)}
-                  disabled={priceInputs.length === 1}
-                >
-                  <img src="/assets/delete.svg" alt="מחק" width={24}/>
-                </button>
-              </div>
-            ))}
-          </div>
-          <div className="h-6 mb-3">
+          <PriceSelector
+            prices={prices}
+            currentPrice={currentPrice}
+            onPricesChange={(newPrices, newCurrentPrice) => {
+              setPrices(newPrices);
+              setCurrentPrice(newCurrentPrice);
+              if (priceError) setPriceError('');
+            }}
+          />
+          <div className="h-6 mt-1">
             {priceError && <span className="text-red-500 text-sm">{priceError}</span>}
           </div>
-          <button 
-            type="button" 
-            onClick={addPriceInput}
-            className="bg-green-500 text-white border-none py-2 px-5 rounded-lg cursor-pointer text-sm transition-colors hover:bg-green-600"
-          >
-            הוסף מחיר נוסף
-          </button>
         </div>
 
         <button 

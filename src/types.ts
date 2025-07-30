@@ -6,7 +6,11 @@ export interface Price {
 export interface Item {
   id: string;
   name: string;
-  description?: string;
   prices: Price[];
+  currentPrice: number; // Optional, can be derived from prices
+  description?: string;
+  category?: string;
+  image?: string;
   createdAt: Date;
+  updatedAt: Date;
 }
