@@ -4,6 +4,7 @@ import { AuthProvider } from './context/AuthContext';
 import { ItemsProvider } from './context/ItemsContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import LoginPage from './components/LoginPage';
+import GoogleCallback from './components/GoogleCallback';
 import MainPage from './components/MainPage';
 import CreatePage from './components/CreatePage';
 import SellPage from './components/SellPage';
@@ -15,6 +16,7 @@ const App: React.FC = () => {
       <ItemsProvider>
       <Routes>
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/auth/callback" element={<GoogleCallback />} />
           <Route 
             path="/" 
             element={

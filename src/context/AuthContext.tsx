@@ -1,8 +1,8 @@
 import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
+import apiService, { User, UserResponse } from '../services/api';
 import { 
   getUserData, 
   setUserData, 
-  removeUserData, 
   clearAllData,
   isStorageSupported,
   getUserDataFallback,
@@ -10,20 +10,14 @@ import {
   clearAllDataFallback
 } from '../utils/indexedDB';
 
-interface User {
-  id: string;
-  name: string;
-  email?: string;
-  avatar?: string;
-  type: 'guest';
-}
-
 interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
   isLoading: boolean;
-  loginAsGuest: (name?: string) => void;
-  logout: () => void;
+  loginAsGuest: (name?: string) => Promise<void>;
+  loginWithGoogle: () => Promise<void>;
+  logout: () => Promise<void>;
+  refreshToken: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -52,25 +46,44 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         const indexedDBSupported = isStorageSupported();
         setUseIndexedDB(indexedDBSupported);
 
-        let savedUser: User | null = null;
+        let savedUserData: { user: User; token: any } | null = null;
 
         if (indexedDBSupported) {
           try {
-            savedUser = await getUserData();
+            savedUserData = await getUserData();
           } catch (error) {
             console.warn('IndexedDB failed, falling back to localStorage:', error);
-            savedUser = getUserDataFallback();
+            savedUserData = getUserDataFallback();
             setUseIndexedDB(false);
           }
         } else {
-          savedUser = getUserDataFallback();
+          savedUserData = getUserDataFallback();
         }
 
-        if (savedUser && savedUser.id && savedUser.name && savedUser.type === 'guest') {
-          setUser(savedUser);
+        if (savedUserData && savedUserData.user && savedUserData.token) {
+          // Set token in API service
+          apiService.setToken(savedUserData.token.access_token);
+          
+          try {
+            // Verify user with backend
+            const currentUser = await apiService.getCurrentUser();
+            setUser(currentUser);
+          } catch (error) {
+            console.error('Failed to verify user with backend:', error);
+            // Token might be expired, try to refresh
+            try {
+              await apiService.refreshToken();
+              const currentUser = await apiService.getCurrentUser();
+              setUser(currentUser);
+            } catch (refreshError) {
+              console.error('Failed to refresh token:', refreshError);
+              // Clear invalid session
+              await clearSession();
+            }
+          }
         }
       } catch (error) {
-        console.error('Failed to load user data:', error);
+        console.error('Failed to initialize auth:', error);
       } finally {
         setIsLoading(false);
       }
@@ -79,34 +92,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     initAuth();
   }, []);
 
-  const loginAsGuest = async (name?: string): Promise<void> => {
-    const guestName = name?.trim() || 'אורח';
-    const guestUser: User = {
-      id: 'guest_' + Date.now(),
-      name: guestName,
-      type: 'guest'
-    };
-    
-    setUser(guestUser);
-    
-    try {
-      if (useIndexedDB) {
-        await setUserData(guestUser);
-      } else {
-        setUserDataFallback(guestUser);
-      }
-    } catch (error) {
-      console.error('Failed to save user data:', error);
-      // Try fallback
-      if (useIndexedDB) {
-        setUserDataFallback(guestUser);
-      }
-    }
-  };
-
-  const logout = async (): Promise<void> => {
-    setUser(null);
-    
+  const clearSession = async (): Promise<void> => {
     try {
       if (useIndexedDB) {
         await clearAllData();
@@ -114,9 +100,145 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         clearAllDataFallback();
       }
     } catch (error) {
-      console.error('Failed to clear data:', error);
+      console.error('Failed to clear session:', error);
+    }
+    
+    apiService.clearToken();
+    setUser(null);
+  };
+
+  const saveSession = async (userResponse: UserResponse): Promise<void> => {
+    try {
+      const sessionData = {
+        user: userResponse.user,
+        token: userResponse.token
+      };
+
+      if (useIndexedDB) {
+        await setUserData(sessionData);
+      } else {
+        setUserDataFallback(sessionData);
+      }
+      
+      apiService.setToken(userResponse.token.access_token);
+      setUser(userResponse.user);
+    } catch (error) {
+      console.error('Failed to save session:', error);
       // Try fallback
-      clearAllDataFallback();
+      if (useIndexedDB) {
+        setUserDataFallback({
+          user: userResponse.user,
+          token: userResponse.token
+        });
+      }
+    }
+  };
+
+  const loginAsGuest = async (name?: string): Promise<void> => {
+    setIsLoading(true);
+    try {
+      const guestName = name?.trim() || 'אורח';
+      const userResponse = await apiService.loginAsGuest({
+        name: guestName,
+        type: 'guest'
+      });
+      
+      await saveSession(userResponse);
+    } catch (error) {
+      console.error('Guest login failed:', error);
+      throw new Error('כניסה כאורח נכשלה. אנא נסה שוב.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const loginWithGoogle = async (): Promise<void> => {
+    setIsLoading(true);
+    try {
+      // Get Google auth URL from backend
+      const { auth_url } = await apiService.getGoogleAuthUrl();
+      
+      // Open Google auth in popup
+      const popup = window.open(
+        auth_url,
+        'google-auth',
+        'width=500,height=600,scrollbars=yes,resizable=yes'
+      );
+
+      if (!popup) {
+        throw new Error('Popup blocked. Please allow popups for this site.');
+      }
+
+      // Listen for popup messages
+      return new Promise((resolve, reject) => {
+        const checkClosed = setInterval(() => {
+          if (popup.closed) {
+            clearInterval(checkClosed);
+            setIsLoading(false);
+            reject(new Error('Google login was cancelled'));
+          }
+        }, 1000);
+
+        const messageListener = async (event: MessageEvent) => {
+          if (event.origin !== window.location.origin) return;
+
+          if (event.data.type === 'GOOGLE_AUTH_SUCCESS' && event.data.code) {
+            clearInterval(checkClosed);
+            popup.close();
+            window.removeEventListener('message', messageListener);
+
+            try {
+              const userResponse = await apiService.handleGoogleCallback(event.data.code);
+              await saveSession(userResponse);
+              resolve();
+            } catch (error) {
+              console.error('Google callback failed:', error);
+              reject(new Error('כניסה עם Google נכשלה. אנא נסה שוב.'));
+            } finally {
+              setIsLoading(false);
+            }
+          }
+
+          if (event.data.type === 'GOOGLE_AUTH_ERROR') {
+            clearInterval(checkClosed);
+            popup.close();
+            window.removeEventListener('message', messageListener);
+            setIsLoading(false);
+            reject(new Error(event.data.error || 'כניסה עם Google נכשלה.'));
+          }
+        };
+
+        window.addEventListener('message', messageListener);
+      });
+    } catch (error) {
+      setIsLoading(false);
+      console.error('Google login failed:', error);
+      throw error;
+    }
+  };
+
+  const logout = async (): Promise<void> => {
+    setIsLoading(true);
+    try {
+      await apiService.logout();
+      await clearSession();
+    } catch (error) {
+      console.error('Logout failed:', error);
+      // Clear session anyway
+      await clearSession();
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const refreshToken = async (): Promise<void> => {
+    try {
+      await apiService.refreshToken();
+      // Token is automatically updated in the API service
+    } catch (error) {
+      console.error('Token refresh failed:', error);
+      await clearSession();
+      throw error;
     }
   };
 
@@ -127,7 +249,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         isAuthenticated: !!user,
         isLoading,
         loginAsGuest,
+        loginWithGoogle,
         logout,
+        refreshToken,
       }}
     >
       {children}
