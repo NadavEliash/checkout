@@ -7,6 +7,8 @@ import {
   getListDataFallback,
   setListDataFallback
 } from '../utils/indexedDB';
+import apiService from '../services/api';
+import { useAuth } from './AuthContext';
 
 
 
@@ -18,10 +20,10 @@ export interface CartItem {
 interface ItemsContextType {
   items: Item[];
   cartItems: CartItem[];
-  addItem: (name: string, prices: Price[], currentPrice: number) => void;
-  updateItem: (id: string, updates: Partial<Omit<Item, 'id' | 'createdAt' | 'updatedAt'>>) => void;
-  deleteItem: (id: string) => void;
-  reorderItems: (startIndex: number, endIndex: number) => void;
+  addItem: (name: string, prices: Price[], currentPrice: number, description?: string) => Promise<void>;
+  updateItem: (id: string, updates: Partial<Omit<Item, 'id' | 'createdAt' | 'updatedAt'>>) => Promise<void>;
+  deleteItem: (id: string) => Promise<void>;
+  reorderItems: (startIndex: number, endIndex: number) => Promise<void>;
   addToCart: (itemId: string, quantity?: number) => void;
   removeFromCart: (itemId: string) => void;
   updateCartItemQuantity: (itemId: string, quantity: number) => void;
@@ -48,51 +50,72 @@ export const ItemsProvider: React.FC<ItemsProviderProps> = ({ children }) => {
   const [items, setItems] = useState<Item[]>([]);
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [useIndexedDB, setUseIndexedDB] = useState(false);
+  const { isAuthenticated, user } = useAuth();
 
-  // Load items and cart from IndexedDB/localStorage on mount
+  // Load items and cart based on authentication status
   useEffect(() => {
     const loadData = async () => {
       try {
-        // Check if IndexedDB is supported
-        const indexedDBSupported = isStorageSupported();
-        setUseIndexedDB(indexedDBSupported);
-
-        let savedData: { items: Item[], cartItems: CartItem[] } | null = null;
-
-        if (indexedDBSupported) {
+        if (isAuthenticated && user?.type === 'google') {
+          // Load items from Redis via API for authenticated Google users
           try {
-            savedData = await getListData();
-          } catch (error) {
-            console.warn('IndexedDB failed, falling back to localStorage:', error);
-            savedData = getListDataFallback();
-            setUseIndexedDB(false);
-          }
-        } else {
-          savedData = getListDataFallback();
-        }
-
-        if (savedData) {
-          // Load items
-          if (savedData.items && Array.isArray(savedData.items)) {
-            const itemsWithDates = savedData.items.map((item: any) => ({
+            const apiItems = await apiService.getItems();
+            const itemsWithDates = apiItems.map((item: any) => ({
               ...item,
               createdAt: new Date(item.createdAt),
               updatedAt: new Date(item.updatedAt)
             }));
             setItems(itemsWithDates);
+            // For authenticated users, start with empty cart (cart is session-based)
+            setCartItems([]);
+          } catch (error) {
+            console.error('Failed to load items from API:', error);
+            // Fallback to empty state for authenticated users
+            setItems([]);
+            setCartItems([]);
+          }
+        } else {
+          // Load from IndexedDB/localStorage for guest users
+          const indexedDBSupported = isStorageSupported();
+          setUseIndexedDB(indexedDBSupported);
+
+          let savedData: { items: Item[], cartItems: CartItem[] } | null = null;
+
+          if (indexedDBSupported) {
+            try {
+              savedData = await getListData();
+            } catch (error) {
+              console.warn('IndexedDB failed, falling back to localStorage:', error);
+              savedData = getListDataFallback();
+              setUseIndexedDB(false);
+            }
+          } else {
+            savedData = getListDataFallback();
           }
 
-          // Load cart
-          if (savedData.cartItems && Array.isArray(savedData.cartItems)) {
-            const cartWithDates = savedData.cartItems.map((cartItem: any) => ({
-              ...cartItem,
-              item: {
-                ...cartItem.item,
-                createdAt: new Date(cartItem.item.createdAt),
-                updatedAt: new Date(cartItem.item.updatedAt)
-              }
-            }));
-            setCartItems(cartWithDates);
+          if (savedData) {
+            // Load items
+            if (savedData.items && Array.isArray(savedData.items)) {
+              const itemsWithDates = savedData.items.map((item: any) => ({
+                ...item,
+                createdAt: new Date(item.createdAt),
+                updatedAt: new Date(item.updatedAt)
+              }));
+              setItems(itemsWithDates);
+            }
+
+            // Load cart
+            if (savedData.cartItems && Array.isArray(savedData.cartItems)) {
+              const cartWithDates = savedData.cartItems.map((cartItem: any) => ({
+                ...cartItem,
+                item: {
+                  ...cartItem.item,
+                  createdAt: new Date(cartItem.item.createdAt),
+                  updatedAt: new Date(cartItem.item.updatedAt)
+                }
+              }));
+              setCartItems(cartWithDates);
+            }
           }
         }
       } catch (error) {
@@ -101,80 +124,156 @@ export const ItemsProvider: React.FC<ItemsProviderProps> = ({ children }) => {
     };
 
     loadData();
-  }, []);
+  }, [isAuthenticated, user]);
 
-  // Save data whenever items or cart change
+  // Save data for guest users only (authenticated users use API)
   useEffect(() => {
     const saveData = async () => {
-      const listData = {
-        items,
-        cartItems
-      };
+      // Only save locally for guest users
+      if (!isAuthenticated || user?.type !== 'google') {
+        const listData = {
+          items,
+          cartItems
+        };
 
-      try {
-        if (useIndexedDB) {
-          await setListData(listData);
-        } else {
-          setListDataFallback(listData);
-        }
-      } catch (error) {
-        console.error('Failed to save list data:', error);
-        // Try fallback
-        if (useIndexedDB) {
-          setListDataFallback(listData);
+        try {
+          if (useIndexedDB) {
+            await setListData(listData);
+          } else {
+            setListDataFallback(listData);
+          }
+        } catch (error) {
+          console.error('Failed to save list data:', error);
+          // Try fallback
+          if (useIndexedDB) {
+            setListDataFallback(listData);
+          }
         }
       }
     };
 
-    // Only save if we have some data (avoid saving on initial empty state)
-    if (items.length > 0 || cartItems.length > 0) {
-      saveData();
+    saveData();
+  }, [items, cartItems, useIndexedDB, isAuthenticated, user]);
+
+  const addItem = async (name: string, prices: Price[], currentPrice: number, description?: string) => {
+    try {
+      if (isAuthenticated && user?.type === 'google') {
+        // Create item via API for authenticated users
+        const newItem = await apiService.createItem({
+          name,
+          prices,
+          currentPrice,
+          description
+        });
+        const itemWithDates = {
+          ...newItem,
+          createdAt: new Date(newItem.createdAt),
+          updatedAt: new Date(newItem.updatedAt)
+        };
+        setItems(prev => [...prev, itemWithDates]);
+      } else {
+        // Create item locally for guest users
+        const newItem: Item = {
+          name,
+          prices,
+          currentPrice,
+          description,
+          id: Date.now().toString() + Math.random().toString(36).substr(2, 9),
+          createdAt: new Date(),
+          updatedAt: new Date()
+        };
+        setItems(prev => [...prev, newItem]);
+      }
+    } catch (error) {
+      console.error('Failed to add item:', error);
+      throw new Error('Failed to add item');
     }
-  }, [items, cartItems, useIndexedDB]);
-
-  const addItem = (name: string, prices: Price[], currentPrice: number) => {
-    const newItem: Item = {
-      name,
-      prices,
-      currentPrice,
-      id: Date.now().toString() + Math.random().toString(36).substr(2, 9),
-      createdAt: new Date(),
-      updatedAt: new Date()
-    };
-    setItems(prev => [...prev, newItem]);
   };
 
-  const updateItem = (id: string, updates: Partial<Omit<Item, 'id' | 'createdAt' | 'updatedAt'>>) => {
-    setItems(prev => prev.map(item => 
-      item.id === id 
-        ? { ...item, ...updates, updatedAt: new Date() }
-        : item
-    ));
+  const updateItem = async (id: string, updates: Partial<Omit<Item, 'id' | 'createdAt' | 'updatedAt'>>) => {
+    try {
+      if (isAuthenticated && user?.type === 'google') {
+        // Update item via API for authenticated users
+        const updatedItem = await apiService.updateItem(id, updates);
+        const itemWithDates = {
+          ...updatedItem,
+          createdAt: new Date(updatedItem.createdAt),
+          updatedAt: new Date(updatedItem.updatedAt)
+        };
+        setItems(prev => prev.map(item => 
+          item.id === id ? itemWithDates : item
+        ));
+        
+        // Update item in cart if it exists there
+        setCartItems(prev => prev.map(cartItem => 
+          cartItem.item.id === id 
+            ? { ...cartItem, item: itemWithDates }
+            : cartItem
+        ));
+      } else {
+        // Update item locally for guest users
+        setItems(prev => prev.map(item => 
+          item.id === id 
+            ? { ...item, ...updates, updatedAt: new Date() }
+            : item
+        ));
 
-    // Update item in cart if it exists there
-    setCartItems(prev => prev.map(cartItem => 
-      cartItem.item.id === id 
-        ? { 
-            ...cartItem, 
-            item: { ...cartItem.item, ...updates, updatedAt: new Date() }
-          }
-        : cartItem
-    ));
+        // Update item in cart if it exists there
+        setCartItems(prev => prev.map(cartItem => 
+          cartItem.item.id === id 
+            ? { 
+                ...cartItem, 
+                item: { ...cartItem.item, ...updates, updatedAt: new Date() }
+              }
+            : cartItem
+        ));
+      }
+    } catch (error) {
+      console.error('Failed to update item:', error);
+      throw new Error('Failed to update item');
+    }
   };
 
-  const deleteItem = (id: string) => {
-    setItems(prev => prev.filter(item => item.id !== id));
-    // Also remove from cart if it exists there
-    setCartItems(prev => prev.filter(cartItem => cartItem.item.id !== id));
+  const deleteItem = async (id: string) => {
+    try {
+      if (isAuthenticated && user?.type === 'google') {
+        // Delete item via API for authenticated users
+        await apiService.deleteItem(id);
+        setItems(prev => prev.filter(item => item.id !== id));
+        setCartItems(prev => prev.filter(cartItem => cartItem.item.id !== id));
+      } else {
+        // Delete item locally for guest users
+        setItems(prev => prev.filter(item => item.id !== id));
+        setCartItems(prev => prev.filter(cartItem => cartItem.item.id !== id));
+      }
+    } catch (error) {
+      console.error('Failed to delete item:', error);
+      throw new Error('Failed to delete item');
+    }
   };
 
-  const reorderItems = (startIndex: number, endIndex: number) => {
-    setItems(prev => {
-      const result = Array.from(prev);
-      const [removed] = result.splice(startIndex, 1);
-      result.splice(endIndex, 0, removed);
-      return result;
-    });
+  const reorderItems = async (startIndex: number, endIndex: number) => {
+    try {
+      const newItems = Array.from(items);
+      const [removed] = newItems.splice(startIndex, 1);
+      newItems.splice(endIndex, 0, removed);
+      
+      if (isAuthenticated && user?.type === 'google') {
+        // Update order via API for authenticated users
+        const itemsWithOrder = newItems.map((item, index) => ({
+          id: item.id,
+          order: index
+        }));
+        await apiService.reorderItems(itemsWithOrder);
+        setItems(newItems);
+      } else {
+        // Update order locally for guest users
+        setItems(newItems);
+      }
+    } catch (error) {
+      console.error('Failed to reorder items:', error);
+      throw new Error('Failed to reorder items');
+    }
   };
 
   const addToCart = (itemId: string, quantity: number = 1) => {

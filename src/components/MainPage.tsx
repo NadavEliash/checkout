@@ -25,16 +25,16 @@ const MainPage: React.FC = () => {
           </div>
           <div className="text-center flex justify-center gap-10">
             <div className="flex flex-col">
-              <h1 className="text-5xl text-gray-700 mb-3 font-bold">צ'קאאוט</h1>
+              <h1 className="text-5xl text-gray-700 mb-3 font-bold">חשבון בבקשה</h1>
               <p className="text-xl text-gray-600 font-light">פשוט למכור</p>
             </div>
-            <img className="w-16" src="/assets/checkout.svg" alt="עגלת קניות" />
+            <img className="w-16" src="/assets/Icons/cart.svg" alt="עגלת קניות" />
           </div>
         </header>
 
         <div className="flex flex-col items-center space-y-6">
           <div className="text-center mb-8">
-            <h2 className="text-2xl font-bold text-white mb-4">ברוכים הבאים לצ'קאאוט</h2>
+            <h2 className="text-2xl font-bold text-white mb-4">ברוכים הבאים לחשבון בבקשה</h2>
             <p className="text-lg text-white/90">הפלטפורמה הפשוטה למכירת פריטים</p>
           </div>
 

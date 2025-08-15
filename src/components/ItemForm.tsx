@@ -3,21 +3,8 @@ import { Price } from '../types';
 import PriceSelector from './PriceSelector';
 
 interface ItemFormProps {
-  onAddItem: (name: string, prices: Price[], currentPrice: number) => void;
+  onAddItem: (name: string, prices: Price[], currentPrice: number, description?: string) => Promise<void>;
 }
-
-interface CheckoutPage {
-  id: string;
-  items: {
-    id: string;
-    name: string;
-    description?: string;
-    prices: Price[];
-    image: string;
-  }[];
-  userDetails: Record<string, any>;
-}
-
 
 const ItemForm: React.FC<ItemFormProps> = ({ onAddItem }) => {
   const [itemName, setItemName] = useState('');
@@ -31,11 +18,11 @@ const ItemForm: React.FC<ItemFormProps> = ({ onAddItem }) => {
     name: string;
     description?: string;
     prices: Price[];
-    image: string;
+    image?: string;
   }[]>([]);
 
 
-  const handleSubmit = (e: React.FormEvent): void => {
+  const handleSubmit = async (e: React.FormEvent): Promise<void> => {
     e.preventDefault();
     
     // Reset errors
@@ -74,22 +61,13 @@ const ItemForm: React.FC<ItemFormProps> = ({ onAddItem }) => {
     };
     setItems(prev => [...prev, newItem]);
     
-    onAddItem(itemName, validPrices, currentPrice);
+    await onAddItem(itemName, validPrices, currentPrice, itemDescription.trim() || undefined);
     
     // Reset form
     setItemName('');
     setItemDescription('');
     setPrices([{ amount: 0, label: 'מחיר רגיל' }]);
     setCurrentPrice(0);
-  };
-
-  const generateCheckoutPage = (): void => {
-    const checkoutPage: CheckoutPage = {
-      id: Date.now().toString(),
-      items: items,
-      userDetails: {}
-    };
-    console.log('Checkout Page:', checkoutPage);
   };
 
   return (
@@ -149,16 +127,6 @@ const ItemForm: React.FC<ItemFormProps> = ({ onAddItem }) => {
           הוסף מוצר
         </button>
       </form>
-      
-      {items.length > 0 && (
-        <button 
-          type="button"
-          onClick={generateCheckoutPage}
-          className="w-full mt-4 bg-gradient-to-r from-green-500 to-blue-600 text-white border-none p-4 rounded-lg text-lg font-semibold cursor-pointer transition-transform hover:-translate-y-0.5 hover:shadow-lg"
-        >
-          צור עמוד תשלום ({items.length} מוצרים)
-        </button>
-      )}
     </section>
   );
 };

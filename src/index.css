@@ -1,3 +1,9 @@
+@import url('https://fonts.googleapis.com/css2?family=Assistant:wght@200..800&family=Fredoka:wght@300..700&family=Heebo:wght@100..900&family=Rubik+Scribble&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+body {
+  font-family: 'Assistant', ui-sans-serif, system-ui, sans-serif;
+}

@@ -2,11 +2,10 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useItems } from '../context/ItemsContext';
 import UserMenu from './UserMenu';
-import { Item } from '../types';
 
 const SellPage: React.FC = () => {
   const navigate = useNavigate();
-  const { items, setSelectedItems } = useItems();
+  const { items, addToCart, clearCart } = useItems();
   const [selectedItemIds, setSelectedItemIds] = useState<string[]>([]);
 
   const handleItemToggle = (itemId: string) => {
@@ -29,8 +28,16 @@ const SellPage: React.FC = () => {
   };
 
   const handleContinueToCheckout = () => {
+    // Clear cart first to avoid duplicate items
+    clearCart();
+    
+    // Add selected items to cart
     const selectedItemsData = getSelectedItemsData();
-    setSelectedItems(selectedItemsData);
+    selectedItemsData.forEach(item => {
+      addToCart(item.id, 1);
+    });
+    
+    // Navigate to cart
     navigate('/cart');
   };
 

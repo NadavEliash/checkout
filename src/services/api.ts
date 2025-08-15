@@ -1,5 +1,6 @@
 // API service for backend communication
 import { getUserData, setUserData, removeUserData } from '../utils/indexedDB';
+import { Item, Price } from '../types';
 
 const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000').replace(/\/$/, '');
 
@@ -131,13 +132,7 @@ class ApiService {
     };
 
     try {
-      console.log(`Making API request to: ${url}`, config);
-      console.log('Request headers:', config.headers);
-      
       const response = await fetch(url, config);
-      console.log(`Response status: ${response.status}`, response);
-      
-      // Handle 401 unauthorized - try token refresh
       if (response.status === 401 && !skipRetry && this.token) {
         console.log('Received 401, attempting token refresh...');
         try {
@@ -257,6 +252,38 @@ class ApiService {
 
   clearToken() {
     this.token = null;
+  }
+
+  // Items APIs (for authenticated users)
+  async getItems(): Promise<Item[]> {
+    return this.request<Item[]>('/api/items');
+  }
+
+  async createItem(item: Omit<Item, 'id' | 'createdAt' | 'updatedAt'>): Promise<Item> {
+    return this.request<Item>('/api/items', {
+      method: 'POST',
+      body: JSON.stringify(item),
+    });
+  }
+
+  async updateItem(id: string, updates: Partial<Omit<Item, 'id' | 'createdAt' | 'updatedAt'>>): Promise<Item> {
+    return this.request<Item>(`/api/items/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(updates),
+    });
+  }
+
+  async deleteItem(id: string): Promise<ApiResponse> {
+    return this.request<ApiResponse>(`/api/items/${id}`, {
+      method: 'DELETE',
+    });
+  }
+
+  async reorderItems(items: { id: string; order: number }[]): Promise<ApiResponse> {
+    return this.request<ApiResponse>('/api/items/reorder', {
+      method: 'PUT',
+      body: JSON.stringify({ items }),
+    });
   }
 }
 

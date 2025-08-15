@@ -18,6 +18,7 @@ interface AuthContextType {
   loginWithGoogle: () => Promise<void>;
   logout: () => Promise<void>;
   refreshToken: () => Promise<void>;
+  clearAllAppData: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -137,9 +138,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const loginAsGuest = async (name?: string): Promise<void> => {
     setIsLoading(true);
     try {
-      const guestName = name?.trim() || 'אורח';
       const userResponse = await apiService.loginAsGuest({
-        name: guestName,
+        name: 'אורח',
         type: 'guest'
       });
       
@@ -242,6 +242,22 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
+  const clearAllAppData = async (): Promise<void> => {
+    try {
+      if (useIndexedDB) {
+        await clearAllData();
+      } else {
+        clearAllDataFallback();
+      }
+    } catch (error) {
+      console.error('Failed to clear all app data:', error);
+      // Try fallback if primary method fails
+      if (useIndexedDB) {
+        clearAllDataFallback();
+      }
+    }
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -252,6 +268,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         loginWithGoogle,
         logout,
         refreshToken,
+        clearAllAppData,
       }}
     >
       {children}

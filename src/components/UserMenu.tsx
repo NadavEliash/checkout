@@ -1,15 +1,46 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { clearAllData, clearAllDataFallback, isStorageSupported } from '../utils/indexedDB';
 
 const UserMenu: React.FC = () => {
   const { user, logout } = useAuth();
+  const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
 
   if (!user) return null;
 
+  const isGuest = user.name === 'אורח';
+
   const handleLogout = () => {
     setIsOpen(false);
     logout();
+  };
+
+  const handleLogin = () => {
+    setIsOpen(false);
+    navigate('/login');
+  };
+
+  const handleRemoveAllData = async () => {
+    setIsOpen(false);
+    try {
+      const indexedDBSupported = isStorageSupported();
+      if (indexedDBSupported) {
+        try {
+          await clearAllData();
+        } catch (error) {
+          console.warn('IndexedDB failed, falling back to localStorage:', error);
+          clearAllDataFallback();
+        }
+      } else {
+        clearAllDataFallback();
+      }
+      // Reload the page to reset the app state
+      window.location.reload();
+    } catch (error) {
+      console.error('Failed to remove all data:', error);
+    }
   };
 
   return (
@@ -51,19 +82,36 @@ const UserMenu: React.FC = () => {
           <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border z-20">
             <div className="py-2">
               <div className="px-4 py-2 text-sm text-gray-500 border-b">
-                אורח
+                {user.name}
               </div>
               {user.email && (
                 <div className="px-4 py-2 text-sm text-gray-600">
                   {user.email}
                 </div>
               )}
-              <button
-                onClick={handleLogout}
-                className="w-full text-right px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
-              >
-                התנתק
-              </button>
+              {isGuest ? (
+                <>
+                  <button
+                    onClick={handleLogin}
+                    className="w-full text-right px-4 py-2 text-sm text-blue-600 hover:bg-blue-50 transition-colors"
+                  >
+                    התחבר
+                  </button>
+                  <button
+                    onClick={handleRemoveAllData}
+                    className="w-full text-right px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
+                  >
+                    מחק את כל הנתונים
+                  </button>
+                </>
+              ) : (
+                <button
+                  onClick={handleLogout}
+                  className="w-full text-right px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
+                >
+                  התנתק
+                </button>
+              )}
             </div>
           </div>
         </>

@@ -7,7 +7,7 @@ import ItemsList from './ItemsList';
 
 const CreatePage: React.FC = () => {
   const navigate = useNavigate();
-  const { items, addItem, deleteItem, reorderItems } = useItems();
+  const { items, addItem, updateItem, deleteItem, reorderItems } = useItems();
 
   const handleBackToMain = () => {
     navigate('/');
@@ -22,7 +22,7 @@ const CreatePage: React.FC = () => {
               onClick={handleBackToMain}
               className="text-indigo-600 hover:text-indigo-800 font-semibold"
             >
-              ← חזור לעמוד הבית
+              חזור לעמוד הבית
             </button>
             <UserMenu />
           </div>
@@ -34,7 +34,7 @@ const CreatePage: React.FC = () => {
 
         <main className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           <ItemForm onAddItem={addItem} />
-          <ItemsList items={items} onDeleteItem={deleteItem} onReorderItems={reorderItems} />
+          <ItemsList items={items} onUpdateItem={updateItem} onDeleteItem={deleteItem} onReorderItems={reorderItems} />
         </main>
       </div>
     </div>
