@@ -1,6 +1,7 @@
 import React from 'react';
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import styles from './ProtectedRoute.module.css';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -11,8 +12,8 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
-        <div className="text-white text-xl">טוען...</div>
+      <div className={styles['loading-page']}>
+        <div className={styles['loading-message']}>טוען...</div>
       </div>
     );
   }

@@ -1,9 +1,22 @@
 @import url('https://fonts.googleapis.com/css2?family=Assistant:wght@200..800&family=Fredoka:wght@300..700&family=Heebo:wght@100..900&family=Rubik+Scribble&display=swap');
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@font-face {
+  font-family: 'Ploni';
+  src: url('../public/assets/Fonts/ploni-bold-aaa.99cbf14a3136b68a9cd9.woff') format('woff');
+  font-weight: bold;
+  font-style: normal;
+  font-display: swap;
+}
+
+@import './styles.css';
+
+/* CSS Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
 
 body {
-  font-family: 'Assistant', ui-sans-serif, system-ui, sans-serif;
+  font-family: 'Ploni', ui-sans-serif, system-ui, sans-serif;
 }

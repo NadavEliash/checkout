@@ -2,6 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useItems } from '../context/ItemsContext';
 import UserMenu from './UserMenu';
+import styles from './MainPage.module.css';
 
 const MainPage: React.FC = () => {
   const navigate = useNavigate();
@@ -16,60 +17,60 @@ const MainPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-500 to-purple-600 text-gray-800 font-sans" dir="rtl">
-      <div className="max-w-6xl mx-auto p-5">
-        <header className="bg-white/95 p-10 rounded-2xl mb-8 shadow-xl">
-          <div className="flex justify-between items-start mb-4">
+    <div className={styles['main-app-container']} dir="rtl">
+      <div className={styles['main-content-wrapper']}>
+        <header className={styles['main-header']}>
+          <div className={styles['header-navigation']}>
             <UserMenu />
             <div></div>
           </div>
-          <div className="text-center flex justify-center gap-10">
-            <div className="flex flex-col">
-              <h1 className="text-5xl text-gray-700 mb-3 font-bold">חשבון בבקשה</h1>
-              <p className="text-xl text-gray-600 font-light">פשוט למכור</p>
+          <div className={styles['hero-section']}>
+            <div className={styles['hero-content']}>
+              <h1 className={styles['app-title']}>חשבון, בבקשה!</h1>
+              <p className={styles['app-subtitle']}>פשוט למכור</p>
             </div>
-            <img className="w-16" src="/assets/Icons/cart.svg" alt="עגלת קניות" />
           </div>
         </header>
 
-        <div className="flex flex-col items-center space-y-6">
-          <div className="text-center mb-8">
-            <h2 className="text-2xl font-bold text-white mb-4">ברוכים הבאים לחשבון בבקשה</h2>
-            <p className="text-lg text-white/90">הפלטפורמה הפשוטה למכירת פריטים</p>
-          </div>
+        <div className={styles['features-container']}>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-2xl">
-            <div className="bg-white/95 p-8 rounded-2xl shadow-xl text-center">
-              <h3 className="text-xl font-bold mb-4 text-gray-700">יצירת פריטים</h3>
-              <p className="text-gray-600 mb-6">הוסף פריטים חדשים למכירה</p>
+          <div className={styles['features-grid']}>
+            <div className={styles['feature-section']}>
+              <div className={styles['feature-header']}>
+                <h3 className={styles['feature-title']}>רשימת הפריטים</h3>
+              </div>
+              <p className={styles['feature-description']}>הוסף פריטים למכירה</p>
               <button
                 onClick={handleNavigateToCreate}
-                className="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors w-full"
+                className={styles['create-items-button']}
               >
-                צור פריטים ({items.length})
+                <p>ליצור ({items.length})</p>
+                <img className={styles['button-icon']} src="/assets/Icons/list.svg" alt="רשימה" />
               </button>
             </div>
 
-            <div className="bg-white/95 p-8 rounded-2xl shadow-xl text-center">
-              <h3 className="text-xl font-bold mb-4 text-gray-700">מכירת פריטים</h3>
-              <p className="text-gray-600 mb-6">בחר פריטים למכירה והמשך לתשלום</p>
+            <div className={styles['feature-section']}>
+              <div className={styles['feature-header']}>
+                <h3 className={styles['feature-title']}>דף מכירה</h3>
+              </div>
+              <p className={styles['feature-description']}>בחר פריטים מהרשימה ליצירת דף תשלום ללקוח</p>
               <button
                 onClick={handleNavigateToSell}
                 disabled={items.length === 0}
-                className={`px-6 py-3 rounded-lg font-semibold w-full transition-colors ${
+                className={`${styles['sell-items-button']} ${
                   items.length === 0
-                    ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                    : 'bg-green-600 text-white hover:bg-green-700'
+                    ? styles['button-disabled']
+                    : styles['button-enabled']
                 }`}
               >
-                מכור פריטים
+                למכור
               </button>
             </div>
           </div>
 
           {items.length === 0 && (
-            <div className="bg-yellow-100 border border-yellow-300 rounded-lg p-4 max-w-md text-center">
-              <p className="text-yellow-800">
+            <div className={styles['empty-state-message']}>
+              <p className={styles['warning-text']}>
                 צור פריטים כדי להתחיל למכור
               </p>
             </div>

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { clearAllData, clearAllDataFallback, isStorageSupported } from '../utils/indexedDB';
+import styles from './UserMenu.module.css';
 
 const UserMenu: React.FC = () => {
   const { user, logout } = useAuth();
@@ -44,27 +45,27 @@ const UserMenu: React.FC = () => {
   };
 
   return (
-    <div className="relative">
+    <div className={styles['user-menu-container']}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 hover:text-gray-900 transition-colors"
+        className={styles['user-menu-trigger']}
       >
         {user.avatar ? (
           <img 
             src={user.avatar} 
             alt={user.name} 
-            className="w-8 h-8 rounded-full"
+            className={styles['user-avatar']}
           />
         ) : (
-          <div className="w-8 h-8 bg-black/20 rounded-full flex items-center justify-center">
-            <span className="text-sm font-semibold">
+          <div className={styles['user-avatar-placeholder']}>
+            <span className={styles['avatar-initials']}>
               {user.name === 'אורח' ? '👤' : user.name.charAt(0)}
             </span>
           </div>
         )}
-        <span className="font-medium">{user.name}</span>
+        <span className={styles['user-display-name']}>{user.name}</span>
         <svg 
-          className={`w-4 h-4 transition-transform ${isOpen ? 'rotate-180' : ''}`}
+          className={`${styles['dropdown-arrow']} ${isOpen ? styles['arrow-open'] : ''}`}
           fill="none" 
           stroke="currentColor" 
           viewBox="0 0 24 24"
@@ -76,16 +77,16 @@ const UserMenu: React.FC = () => {
       {isOpen && (
         <>
           <div 
-            className="fixed inset-0 z-10" 
+            className={styles['menu-backdrop']} 
             onClick={() => setIsOpen(false)}
           />
-          <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border z-20">
-            <div className="py-2">
-              <div className="px-4 py-2 text-sm text-gray-500 border-b">
+          <div className={styles['user-menu-dropdown']}>
+            <div className={styles['menu-content']}>
+              <div className={styles['menu-user-info']}>
                 {user.name}
               </div>
               {user.email && (
-                <div className="px-4 py-2 text-sm text-gray-600">
+                <div className={styles['menu-user-email']}>
                   {user.email}
                 </div>
               )}
@@ -93,13 +94,13 @@ const UserMenu: React.FC = () => {
                 <>
                   <button
                     onClick={handleLogin}
-                    className="w-full text-right px-4 py-2 text-sm text-blue-600 hover:bg-blue-50 transition-colors"
+                    className={styles['menu-login-button']}
                   >
                     התחבר
                   </button>
                   <button
                     onClick={handleRemoveAllData}
-                    className="w-full text-right px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
+                    className={styles['menu-clear-data-button']}
                   >
                     מחק את כל הנתונים
                   </button>
@@ -107,7 +108,7 @@ const UserMenu: React.FC = () => {
               ) : (
                 <button
                   onClick={handleLogout}
-                  className="w-full text-right px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
+                  className={styles['menu-logout-button']}
                 >
                   התנתק
                 </button>

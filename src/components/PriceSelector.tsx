@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Price } from '../types';
+import styles from './PriceSelector.module.css';
 
 interface PriceSelectorProps {
   prices: Price[];
@@ -74,24 +75,24 @@ const PriceSelector: React.FC<PriceSelectorProps> = ({
   };
 
   return (
-    <div className={`space-y-3 ${className}`}>
-      <label className="block text-sm font-medium text-gray-700 mb-2">
+    <div className={`${styles['price-selector-container']} ${className}`}>
+      <label className={styles['section-title']}>
         מחירים (עד 2 מחירים)
       </label>
       
       {localPrices.map((price, index) => (
-        <div key={index} className="flex items-center space-x-2 space-x-reverse bg-gray-50 p-3 rounded-lg">
+        <div key={index} className={styles['price-item']}>
           {/* Radio button to select current price */}
           <input
             type="radio"
             name="currentPrice"
             checked={selectedPriceIndex === index}
             onChange={() => handleCurrentPriceChange(index)}
-            className="w-4 h-4 text-indigo-600 focus:ring-indigo-500"
+            className={styles['radio-input']}
           />
           
           {/* Price amount input */}
-          <div className="flex-1">
+          <div className={styles['price-item']}>
             <input
               type="number"
               min="0"
@@ -99,19 +100,18 @@ const PriceSelector: React.FC<PriceSelectorProps> = ({
               value={price.amount || ''}
               onChange={(e) => handlePriceChange(index, 'amount', e.target.value)}
               placeholder="מחיר"
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-right
-              [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+              className={styles['price-input']}
             />
           </div>
           
           {/* Price label input */}
-          <div className="flex-1">
+          <div className={styles['price-item']}>
             <input
               type="text"
               value={price.label}
               onChange={(e) => handlePriceChange(index, 'label', e.target.value)}
               placeholder="תווית מחיר"
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-right"
+              className={styles['price-label']}
             />
           </div>
           
@@ -120,7 +120,7 @@ const PriceSelector: React.FC<PriceSelectorProps> = ({
             <button
               type="button"
               onClick={() => removePrice(index)}
-              className="p-2 text-red-600 hover:text-red-800 hover:bg-red-50 rounded-md transition-colors"
+              className={styles['remove-button']}
               title="הסר מחיר"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -136,7 +136,7 @@ const PriceSelector: React.FC<PriceSelectorProps> = ({
         <button
           type="button"
           onClick={addPrice}
-          className="w-full py-2 px-4 border-2 border-dashed border-gray-300 rounded-lg text-gray-600 hover:border-indigo-300 hover:text-indigo-600 transition-colors flex items-center justify-center space-x-2 space-x-reverse"
+          className={styles['add-price-button']}
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
@@ -146,23 +146,23 @@ const PriceSelector: React.FC<PriceSelectorProps> = ({
       )}
       
       {/* Price display preview */}
-      <div className="bg-blue-50 p-3 rounded-lg">
-        <p className="text-sm font-medium text-blue-900 mb-2">תצוגה מקדימה:</p>
-        <div className="flex items-center justify-end space-x-2 space-x-reverse">
+      <div className={styles['current-price-section']}>
+        <p className={styles['section-title']}>תצוגה מקדימה:</p>
+        <div className={styles['radio-group']}>
           {localPrices.map((price, index) => (
             <span
               key={index}
-              className={`text-lg font-semibold ${
+              className={`${styles['radio-label']} ${
                 selectedPriceIndex === index
-                  ? 'text-green-600'
-                  : 'text-gray-500 line-through'
+                  ? styles['current-price']
+                  : styles['other-price']
               }`}
             >
               ₪{price.amount.toFixed(2)}
             </span>
           ))}
         </div>
-        <p className="text-xs text-blue-700 mt-1">
+        <p className={styles['radio-label']}>
           המחיר הנבחר (עם הנקודה הירוקה) יוצג כמחיר הנוכחי
         </p>
       </div>

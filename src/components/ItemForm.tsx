@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Price } from '../types';
 import PriceSelector from './PriceSelector';
+import styles from './ItemForm.module.css';
 
 interface ItemFormProps {
   onAddItem: (name: string, prices: Price[], currentPrice: number, description?: string) => Promise<void>;
@@ -71,11 +72,11 @@ const ItemForm: React.FC<ItemFormProps> = ({ onAddItem }) => {
   };
 
   return (
-    <section className="bg-white/95 p-8 rounded-2xl shadow-xl">
-      <h2 className="text-3xl text-gray-700 mb-5 text-center font-semibold">הוסף מוצר חדש</h2>
-      <form onSubmit={handleSubmit} className="flex flex-col gap-5">
-        <div className="flex flex-col">
-          <label htmlFor="item-name" className="font-semibold mb-2 text-gray-600">שם המוצר:</label>
+    <section className={styles['item-form-section']}>
+      <h2 className={styles['form-title']}>הוסף מוצר חדש</h2>
+      <form onSubmit={handleSubmit} className={styles['item-form']}>
+        <div className={styles['form-field']}>
+          <label htmlFor="item-name" className={styles['field-label']}>שם המוצר:</label>
           <input
             type="text"
             id="item-name"
@@ -84,28 +85,28 @@ const ItemForm: React.FC<ItemFormProps> = ({ onAddItem }) => {
               setItemName(e.target.value);
               if (nameError) setNameError('');
             }}
-            className={`p-3 border-2 rounded-lg text-base transition-colors focus:outline-none ${
-              nameError ? 'border-red-500 focus:border-red-500' : 'border-gray-200 focus:border-indigo-500'
+            className={`${styles['text-input']} ${
+              nameError ? styles['input-error'] : styles['input-normal']
             }`}
           />
-          <div className="h-6 mt-1">
-            {nameError && <span className="text-red-500 text-sm">{nameError}</span>}
+          <div className={styles['error-container']}>
+            {nameError && <span className={styles['error-text']}>{nameError}</span>}
           </div>
         </div>
 
-        <div className="flex flex-col">
-          <label htmlFor="item-description" className="font-semibold mb-2 text-gray-600">תיאור המוצר (אופציונלי):</label>
+        <div className={styles['form-field']}>
+          <label htmlFor="item-description" className={styles['field-label']}>תיאור המוצר (אופציונלי):</label>
           <textarea
             id="item-description"
             value={itemDescription}
             onChange={(e) => setItemDescription(e.target.value)}
             rows={3}
-            className="p-3 border-2 border-gray-200 rounded-lg text-base transition-colors focus:outline-none focus:border-indigo-500 resize-vertical"
+            className={styles['textarea-input']}
             placeholder="הוסף תיאור למוצר..."
           />
         </div>
 
-        <div className="flex flex-col">
+        <div className={styles['form-field']}>
           <PriceSelector
             prices={prices}
             currentPrice={currentPrice}
@@ -115,14 +116,14 @@ const ItemForm: React.FC<ItemFormProps> = ({ onAddItem }) => {
               if (priceError) setPriceError('');
             }}
           />
-          <div className="h-6 mt-1">
-            {priceError && <span className="text-red-500 text-sm">{priceError}</span>}
+          <div className={styles['error-container']}>
+            {priceError && <span className={styles['error-text']}>{priceError}</span>}
           </div>
         </div>
 
         <button 
           type="submit"
-          className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white border-none p-4 rounded-lg text-lg font-semibold cursor-pointer transition-transform hover:-translate-y-0.5 hover:shadow-lg"
+          className={styles['add-item-button']}
         >
           הוסף מוצר
         </button>

@@ -1,0 +1,15 @@
+@import '../styles.css';
+
+/* Protected Route Specific Styles */
+.loading-page {
+  min-height: 100vh;
+  background: var(--gradient-app-background);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.loading-message {
+  color: var(--color-white);
+  font-size: var(--font-xl);
+}

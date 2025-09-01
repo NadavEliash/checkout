@@ -1,0 +1,42 @@
+@import '../styles.css';
+
+/* Price Display Specific Styles */
+.price-container {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.current-price {
+  color: var(--color-success);
+  font-weight: var(--font-semibold);
+}
+
+.price-label {
+  font-size: var(--font-xs);
+  color: var(--color-success-hover);
+}
+
+.other-price {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.other-price-label {
+  font-size: var(--font-xs);
+  color: var(--color-gray-500);
+}
+
+/* Size variants */
+.small {
+  font-size: var(--font-sm);
+}
+
+.medium {
+  font-size: var(--font-base);
+}
+
+.large {
+  font-size: var(--font-lg);
+}

@@ -1,0 +1,109 @@
+@import '../styles.css';
+
+/* Price Selector Specific Styles */
+.price-selector-container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.section-title {
+  font-weight: var(--font-semibold);
+  color: var(--color-gray-700);
+  margin-bottom: var(--spacing-sm);
+}
+
+.price-item {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-sm);
+}
+
+.price-input {
+  padding: var(--spacing-md);
+  border: 2px solid var(--color-gray-300);
+  border-radius: var(--radius-md);
+  font-size: var(--font-base);
+  transition: border-color var(--transition-normal);
+  outline: none;
+  flex: 1;
+}
+
+.price-input:focus {
+  border-color: var(--color-primary);
+}
+
+.price-label {
+  padding: var(--spacing-md);
+  border: 2px solid var(--color-gray-300);
+  border-radius: var(--radius-md);
+  font-size: var(--font-base);
+  transition: border-color var(--transition-normal);
+  outline: none;
+  flex: 1;
+}
+
+.price-label:focus {
+  border-color: var(--color-primary);
+}
+
+.remove-button {
+  background-color: var(--color-error);
+  color: var(--color-white);
+  border: none;
+  border-radius: var(--radius-md);
+  font-weight: var(--font-semibold);
+  cursor: pointer;
+  transition: all var(--transition-normal);
+  padding: var(--spacing-sm);
+  min-width: auto;
+}
+
+.remove-button:hover {
+  background-color: var(--color-error-hover);
+}
+
+.add-price-button {
+  background-color: var(--color-gray-600);
+  color: var(--color-white);
+  border: none;
+  padding: var(--spacing-lg);
+  border-radius: var(--radius-md);
+  font-size: var(--font-base);
+  font-weight: var(--font-semibold);
+  cursor: pointer;
+  transition: background-color var(--transition-normal);
+  margin-bottom: var(--spacing-lg);
+}
+
+.add-price-button:hover {
+  background-color: var(--color-gray-700);
+}
+
+.current-price-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.radio-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.radio-item {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.radio-input {
+  margin-right: var(--spacing-sm);
+}
+
+.radio-label {
+  font-size: var(--font-sm);
+  color: var(--color-gray-700);
+}
