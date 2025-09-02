@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { clearAllData, clearAllDataFallback, isStorageSupported } from '../utils/indexedDB';
-import styles from './UserMenu.module.css';
 
 const UserMenu: React.FC = () => {
   const { user, logout } = useAuth();
@@ -45,27 +44,24 @@ const UserMenu: React.FC = () => {
   };
 
   return (
-    <div className={styles['user-menu-container']}>
+    <div>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className={styles['user-menu-trigger']}
       >
         {user.avatar ? (
           <img 
             src={user.avatar} 
             alt={user.name} 
-            className={styles['user-avatar']}
           />
         ) : (
-          <div className={styles['user-avatar-placeholder']}>
-            <span className={styles['avatar-initials']}>
+          <div>
+            <span>
               {user.name === 'אורח' ? '👤' : user.name.charAt(0)}
             </span>
           </div>
         )}
-        <span className={styles['user-display-name']}>{user.name}</span>
+        <span>{user.name}</span>
         <svg 
-          className={`${styles['dropdown-arrow']} ${isOpen ? styles['arrow-open'] : ''}`}
           fill="none" 
           stroke="currentColor" 
           viewBox="0 0 24 24"
@@ -77,16 +73,16 @@ const UserMenu: React.FC = () => {
       {isOpen && (
         <>
           <div 
-            className={styles['menu-backdrop']} 
+ 
             onClick={() => setIsOpen(false)}
           />
-          <div className={styles['user-menu-dropdown']}>
-            <div className={styles['menu-content']}>
-              <div className={styles['menu-user-info']}>
+          <div>
+            <div>
+              <div>
                 {user.name}
               </div>
               {user.email && (
-                <div className={styles['menu-user-email']}>
+                <div>
                   {user.email}
                 </div>
               )}
@@ -94,13 +90,11 @@ const UserMenu: React.FC = () => {
                 <>
                   <button
                     onClick={handleLogin}
-                    className={styles['menu-login-button']}
                   >
                     התחבר
                   </button>
                   <button
                     onClick={handleRemoveAllData}
-                    className={styles['menu-clear-data-button']}
                   >
                     מחק את כל הנתונים
                   </button>
@@ -108,7 +102,6 @@ const UserMenu: React.FC = () => {
               ) : (
                 <button
                   onClick={handleLogout}
-                  className={styles['menu-logout-button']}
                 >
                   התנתק
                 </button>

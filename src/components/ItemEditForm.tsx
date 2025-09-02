@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Item, Price } from '../types';
 import PriceSelector from './PriceSelector';
-import styles from './ItemEditForm.module.css';
 
 interface ItemEditFormProps {
   item: Item;
@@ -62,9 +61,9 @@ const ItemEditForm: React.FC<ItemEditFormProps> = ({ item, onSave, onCancel }) =
   };
 
   return (
-    <form onSubmit={handleSubmit} className={styles['edit-form']}>
-      <div className={styles['form-field']}>
-        <label htmlFor={`edit-name-${item.id}`} className={styles['field-label']}>שם המוצר:</label>
+    <form onSubmit={handleSubmit} >
+      <div >
+        <label htmlFor={`edit-name-${item.id}`} >שם המוצר:</label>
         <input
           type="text"
           id={`edit-name-${item.id}`}
@@ -73,26 +72,25 @@ const ItemEditForm: React.FC<ItemEditFormProps> = ({ item, onSave, onCancel }) =
             setItemName(e.target.value);
             if (nameError) setNameError('');
           }}
-          className={nameError ? `${styles['text-input']} ${styles['input-error']}` : styles['text-input']}
           disabled={isLoading}
         />
-        {nameError && <span className={styles['error-text']}>{nameError}</span>}
+        {nameError && <span >{nameError}</span>}
       </div>
 
-      <div className={styles['form-field']}>
-        <label htmlFor={`edit-description-${item.id}`} className={styles['field-label']}>תיאור המוצר:</label>
+      <div >
+        <label htmlFor={`edit-description-${item.id}`} >תיאור המוצר:</label>
         <textarea
           id={`edit-description-${item.id}`}
           value={itemDescription}
           onChange={(e) => setItemDescription(e.target.value)}
           rows={2}
-          className={styles['textarea-input']}
+          
           placeholder="הוסף תיאור למוצר..."
           disabled={isLoading}
         />
       </div>
 
-      <div className={styles['form-field']}>
+      <div >
         <PriceSelector
           prices={prices}
           currentPrice={currentPrice}
@@ -102,14 +100,14 @@ const ItemEditForm: React.FC<ItemEditFormProps> = ({ item, onSave, onCancel }) =
             if (priceError) setPriceError('');
           }}
         />
-        {priceError && <span className={styles['error-text']}>{priceError}</span>}
+        {priceError && <span >{priceError}</span>}
       </div>
 
-      <div className={styles['button-group']}>
+      <div >
         <button 
           type="submit"
           disabled={isLoading}
-          className={styles['save-button']}
+          
         >
           {isLoading ? 'שומר...' : 'שמור'}
         </button>
@@ -117,7 +115,7 @@ const ItemEditForm: React.FC<ItemEditFormProps> = ({ item, onSave, onCancel }) =
           type="button"
           onClick={onCancel}
           disabled={isLoading}
-          className={styles['cancel-button']}
+          
         >
           ביטול
         </button>

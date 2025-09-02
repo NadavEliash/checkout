@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useItems } from '../context/ItemsContext';
 import UserMenu from './UserMenu';
-import styles from './SellPage.module.css';
 
 const SellPage: React.FC = () => {
   const navigate = useNavigate();
@@ -43,40 +42,40 @@ const SellPage: React.FC = () => {
   };
 
   return (
-    <div className={styles['sell-page']} dir="rtl">
-      <div className={styles['sell-page-content']}>
-        <header className={styles['sell-page-header']}>
-          <div className={styles['header-navigation']}>
+    <div  dir="rtl">
+      <div >
+        <header >
+          <div >
             <button
               onClick={() => navigate('/')}
-              className={styles['back-to-home-button']}
+              
             >
               חזור לעמוד הבית
             </button>
             <UserMenu />
           </div>
-          <div className={styles['page-title-section']}>
-            <h1 className={styles['page-title']}>דף מכירות</h1>
-            <p className={styles['page-subtitle']}>בחר פריטים למכירה והמשך לתשלום</p>
+          <div >
+            <h1 >דף מכירות</h1>
+            <p >בחר פריטים למכירה והמשך לתשלום</p>
           </div>
         </header>
 
-        <div className={styles['items-selection-section']}>
+        <div >
         
           {items.length === 0 ? (
-            <div className={styles['empty-items-message']}>
-              <p className={styles['empty-message-text']}>אין פריטים זמינים למכירה</p>
+            <div >
+              <p >אין פריטים זמינים למכירה</p>
               <button
                 onClick={() => navigate('/create')}
-                className={styles['create-new-items-button']}
+                
               >
                 צור פריטים חדשים
               </button>
             </div>
           ) : (
-            <div className={styles['items-list']}>
+            <div >
               {items.map(item => (
-                <div key={item.id} className={styles['selectable-item-card']}>
+                <div key={item.id} >
                   <input
                     type="checkbox"
                     checked={selectedItemIds.includes(item.id)}
@@ -84,7 +83,7 @@ const SellPage: React.FC = () => {
                     style={{ marginLeft: '1rem', width: '1.25rem', height: '1.25rem', accentColor: '#4f46e5' }}
                   />
                   <div style={{ flex: 1 }}>
-                    <h3 className={styles['item-name']}>{item.name}</h3>
+                    <h3 >{item.name}</h3>
                     <div style={{ fontSize: '0.875rem', color: '#4b5563' }}>
                       {item.prices.map((price, index) => (
                         <span key={index} style={{ marginLeft: '0.5rem' }}>
@@ -99,19 +98,14 @@ const SellPage: React.FC = () => {
           )}
         </div>
 
-        <div className={styles['checkout-bar']}>
-          <div className={styles['checkout-bar-content']}>
-          <div className={styles['total-price']}>
+        <div >
+          <div >
+          <div >
             סה"כ: ₪{calculateTotal()}
           </div>
           <button
             onClick={handleContinueToCheckout}
             disabled={selectedItemIds.length === 0}
-            className={`${styles['checkout-button']} ${
-              selectedItemIds.length === 0
-                ? styles['button-disabled']
-                : styles['button-enabled']
-            }`}
           >
             המשך לתשלום ({selectedItemIds.length})
           </button>

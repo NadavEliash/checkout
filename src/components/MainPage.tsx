@@ -2,7 +2,6 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useItems } from '../context/ItemsContext';
 import UserMenu from './UserMenu';
-import styles from './MainPage.module.css';
 
 const MainPage: React.FC = () => {
   const navigate = useNavigate();
@@ -17,51 +16,45 @@ const MainPage: React.FC = () => {
   };
 
   return (
-    <div className={styles['main-app-container']} dir="rtl">
-      <div className={styles['main-content-wrapper']}>
-        <header className={styles['main-header']}>
-          <div className={styles['header-navigation']}>
+    <div dir="rtl">
+      <div>
+        <header>
+          <div>
             <UserMenu />
             <div></div>
           </div>
-          <div className={styles['hero-section']}>
-            <div className={styles['hero-content']}>
-              <h1 className={styles['app-title']}>חשבון, בבקשה!</h1>
-              <p className={styles['app-subtitle']}>פשוט למכור</p>
+          <div>
+            <div>
+              <h1>חשבון, בבקשה!</h1>
+              <p>פשוט למכור</p>
             </div>
           </div>
         </header>
 
-        <div className={styles['features-container']}>
+        <div>
 
-          <div className={styles['features-grid']}>
-            <div className={styles['feature-section']}>
-              <div className={styles['feature-header']}>
-                <h3 className={styles['feature-title']}>רשימת הפריטים</h3>
+          <div>
+            <div>
+              <div>
+                <h3>רשימת הפריטים</h3>
               </div>
-              <p className={styles['feature-description']}>הוסף פריטים למכירה</p>
+              <p>הוסף פריטים למכירה</p>
               <button
                 onClick={handleNavigateToCreate}
-                className={styles['create-items-button']}
               >
                 <p>ליצור ({items.length})</p>
-                <img className={styles['button-icon']} src="/assets/Icons/list.svg" alt="רשימה" />
+                <img src="/assets/Icons/list.svg" alt="רשימה" />
               </button>
             </div>
 
-            <div className={styles['feature-section']}>
-              <div className={styles['feature-header']}>
-                <h3 className={styles['feature-title']}>דף מכירה</h3>
+            <div>
+              <div>
+                <h3>דף מכירה</h3>
               </div>
-              <p className={styles['feature-description']}>בחר פריטים מהרשימה ליצירת דף תשלום ללקוח</p>
+              <p>בחר פריטים מהרשימה ליצירת דף תשלום ללקוח</p>
               <button
                 onClick={handleNavigateToSell}
                 disabled={items.length === 0}
-                className={`${styles['sell-items-button']} ${
-                  items.length === 0
-                    ? styles['button-disabled']
-                    : styles['button-enabled']
-                }`}
               >
                 למכור
               </button>
@@ -69,8 +62,8 @@ const MainPage: React.FC = () => {
           </div>
 
           {items.length === 0 && (
-            <div className={styles['empty-state-message']}>
-              <p className={styles['warning-text']}>
+            <div>
+              <p>
                 צור פריטים כדי להתחיל למכור
               </p>
             </div>

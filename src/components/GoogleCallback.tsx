@@ -1,5 +1,4 @@
 import React, { useEffect } from 'react';
-import styles from './GoogleCallback.module.css';
 
 const GoogleCallback: React.FC = () => {
   useEffect(() => {
@@ -38,10 +37,32 @@ const GoogleCallback: React.FC = () => {
   }, []);
 
   return (
-    <div className={styles['callback-page']}>
-      <div className={styles['callback-card']}>
-        <div className={styles['callback-spinner']}></div>
-        <p className={styles['callback-message']}>מתחבר...</p>
+    <div style={{
+      minHeight: '100vh',
+      background: 'var(--gradient-app-background)',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center'
+    }}>
+      <div style={{
+        background: 'var(--color-white-transparent)',
+        borderRadius: 'var(--radius-xl)',
+        padding: 'var(--spacing-2xl)',
+        boxShadow: 'var(--shadow-xl)',
+        textAlign: 'center'
+      }}>
+        <div style={{
+          width: 'var(--spacing-2xl)',
+          height: 'var(--spacing-2xl)',
+          border: '3px solid var(--color-gray-300)',
+          borderTop: '3px solid var(--color-primary)',
+          borderRadius: '50%',
+          animation: 'spin 1s linear infinite',
+          margin: '0 auto var(--spacing-lg)'
+        }}></div>
+        <p style={{
+          color: 'var(--color-gray-700)'
+        }}>מתחבר...</p>
       </div>
     </div>
   );

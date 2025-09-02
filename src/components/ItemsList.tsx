@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { Item } from '../types';
 import PriceDisplay from './PriceDisplay';
 import ItemEditForm from './ItemEditForm';
-import styles from './ItemsList.module.css';
 
 interface ItemsListProps {
   items: Item[];
@@ -72,9 +71,9 @@ const ItemsList: React.FC<ItemsListProps> = ({ items, onUpdateItem, onDeleteItem
 
   if (items.length === 0) {
     return (
-      <section className={styles['item-card']}>
-        <h2 className={styles['section-title']}>רשימת המוצרים שלי</h2>
-        <div className={styles['empty-state']}>
+      <section >
+        <h2 >רשימת המוצרים שלי</h2>
+        <div >
           <p>
             עדיין לא הוספת מוצרים. התחל על ידי הוספת המוצר הראשון שלך!
           </p>
@@ -84,15 +83,12 @@ const ItemsList: React.FC<ItemsListProps> = ({ items, onUpdateItem, onDeleteItem
   }
 
   return (
-    <section className={styles['item-card']}>
-      <h2 className={styles['section-title']}>רשימת המוצרים שלי</h2>
-      <div className={styles['items-list']}>
+    <section >
+      <h2 >רשימת המוצרים שלי</h2>
+      <div >
         {items.map((item, index) => (
           <div 
             key={item.id} 
-            className={`${styles['item-card']} ${
-              draggedIndex === index ? styles['drag-overlay'] : ''
-            }`}
             draggable={editingItemId !== item.id}
             onDragStart={editingItemId !== item.id ? (e) => handleDragStart(e, index) : undefined}
             onDragOver={editingItemId !== item.id ? (e) => handleDragOver(e, index) : undefined}
@@ -108,33 +104,33 @@ const ItemsList: React.FC<ItemsListProps> = ({ items, onUpdateItem, onDeleteItem
               />
             ) : (
               <>
-                <div className={styles['item-header']}>
-                  <div className={styles['item-name']}>{item.name}</div>
+                <div >
+                  <div >{item.name}</div>
                   <PriceDisplay 
                     prices={item.prices}
                     currentPrice={item.currentPrice}
                     size="lg"
                     showLabels={true}
                   />
-                  <div className={styles['item-actions']}>
+                  <div >
                     <button 
                       onClick={() => handleEditClick(item.id)} 
                       title="ערוך מוצר"
-                      className={styles['edit-button']}
+                      
                     >
                       ערוך
                     </button>
                     <button 
                       onClick={() => onDeleteItem(item.id)} 
                       title="מחק מוצר"
-                      className={styles['delete-button']}
+                      
                     >
-                      <img className="opacity-30 hover:opacity-100" src="/assets/Icons/delete.svg" alt="מחק" width={24} />
+                      <img src="/assets/Icons/delete.svg" alt="מחק" width={24} />
                     </button>
                   </div>
                 </div>
                 {item.description && (
-                  <div className={styles['item-description']}>{item.description}</div>
+                  <div >{item.description}</div>
                 )}
               </>
             )}
@@ -146,7 +142,7 @@ const ItemsList: React.FC<ItemsListProps> = ({ items, onUpdateItem, onDeleteItem
         <button 
           type="button"
           onClick={handleCreateCheckoutPage}
-          className={styles['edit-button']}
+          
         >
           צור עמוד תשלום ({items.length} מוצרים)
         </button>

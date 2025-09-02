@@ -1,6 +1,5 @@
 import React from 'react';
 import { Price } from '../types';
-import styles from './PriceDisplay.module.css';
 
 interface PriceDisplayProps {
   prices: Price[];
@@ -19,31 +18,26 @@ const PriceDisplay: React.FC<PriceDisplayProps> = ({
 }) => {
   if (!prices || prices.length === 0) {
     return (
-      <span className={`${styles['other-price']} ${className}`}>
+      <span>
         ₪0.00
       </span>
     );
   }
 
-  const sizeClasses = {
-    sm: styles['small'],
-    md: styles['medium'],
-    lg: styles['large']
-  };
 
   const currentPriceObj = prices.find(p => p.amount === currentPrice);
   const otherPrices = prices.filter(p => p.amount !== currentPrice);
 
   return (
-    <div className={`${styles['price-container']} ${className}`}>
+    <div>
       {/* Current price - highlighted */}
       {currentPriceObj && (
-        <div className={styles['current-price']}>
-          <span className={`${styles['current-price']} ${sizeClasses[size]}`}>
+        <div >
+          <span>
             ₪{currentPriceObj.amount.toFixed(2)}
           </span>
           {showLabels && currentPriceObj.label && (
-            <span className={styles['price-label']}>
+            <span >
               {currentPriceObj.label}
             </span>
           )}
@@ -52,12 +46,12 @@ const PriceDisplay: React.FC<PriceDisplayProps> = ({
       
       {/* Other prices - crossed out */}
       {otherPrices.map((price, index) => (
-        <div key={index} className={styles['other-price']}>
-          <span className={`${styles['other-price']} ${sizeClasses[size]}`}>
+        <div key={index} >
+          <span>
             ₪{price.amount.toFixed(2)}
           </span>
           {showLabels && price.label && (
-            <span className={styles['other-price-label']}>
+            <span >
               {price.label}
             </span>
           )}
