@@ -22,6 +22,12 @@ const UserMenu: React.FC = () => {
     return words[0].charAt(0);
   };
 
+  const getGreeting = (name: string) => {
+    if (name === 'אורח') return 'אורח';
+    const firstName = name.split(' ')[0];
+    return `שלום ${firstName}`;
+  };
+
   const handleLogout = () => {
     setIsOpen(false);
     logout();
@@ -54,33 +60,39 @@ const UserMenu: React.FC = () => {
   };
 
   return (
-    <div className="dropdown-menu">
+    <>
+      {isOpen && <div className="dropdown-backdrop" onClick={() => setIsOpen(false)} />}
+      <div className="dropdown-menu">
         <button
           onClick={() => setIsOpen(!isOpen)}
-          className="action-button secondary"
+          className="action-button secondary user-menu-button"
         >
-          {user.avatar ? (
-            <img 
-              className="avatar"
-              src={user.avatar} 
-              alt={user.name}
-              onError={(e) => {
-                const target = e.target as HTMLImageElement;
-                target.style.display = 'none';
-                const parent = target.parentElement;
-                if (parent) {
-                  parent.innerHTML = `<span class="avatar-initials">${getInitials(user.name)}</span>`;
-                }
-              }}
-            />
-          ) : (
-            <div className="avatar">
+          <div className="avatar">
+            {user.avatar ? (
+              <>
+                <img 
+                  src={user.avatar} 
+                  alt={user.name}
+                  onError={(e) => {
+                    const target = e.target as HTMLImageElement;
+                    target.style.display = 'none';
+                    const initialsSpan = target.nextElementSibling as HTMLSpanElement;
+                    if (initialsSpan) {
+                      initialsSpan.style.display = 'flex';
+                    }
+                  }}
+                />
+                <span className="avatar-initials" style={{ display: 'none' }}>
+                  {getInitials(user.name)}
+                </span>
+              </>
+            ) : (
               <span className="avatar-initials">
                 {getInitials(user.name)}
               </span>
-            </div>
-          )}
-          <span>{user.name}</span>
+            )}
+          </div>
+          <span>{getGreeting(user.name)}</span>
           <img className="icon small" src="/assets/Icons/arrow-down.svg" alt="v" />
         </button>
 
@@ -120,7 +132,8 @@ const UserMenu: React.FC = () => {
               )}
         </div>
         </div>
-    </div>
+      </div>
+    </>
   );
 };
 
