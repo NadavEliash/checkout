@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Price } from '../types';
+import './PriceSelector.css';
 
 interface PriceSelectorProps {
   prices: Price[];
@@ -74,43 +75,43 @@ const PriceSelector: React.FC<PriceSelectorProps> = ({
   };
 
   return (
-    <div>
-      <label >
+    <div className="price-selector">
+      <label className="selector-label">
         מחירים (עד 2 מחירים)
       </label>
       
       {localPrices.map((price, index) => (
-        <div key={index} >
+        <div key={index} className="price-item">
           {/* Radio button to select current price */}
           <input
             type="radio"
             name="currentPrice"
+            className="price-radio"
             checked={selectedPriceIndex === index}
             onChange={() => handleCurrentPriceChange(index)}
-            
           />
           
           {/* Price amount input */}
-          <div >
+          <div className="input-group">
             <input
               type="number"
               min="0"
               step="0.01"
+              className="price-input"
               value={price.amount || ''}
               onChange={(e) => handlePriceChange(index, 'amount', e.target.value)}
               placeholder="מחיר"
-              
             />
           </div>
           
           {/* Price label input */}
-          <div >
+          <div className="input-group">
             <input
               type="text"
+              className="label-input"
               value={price.label}
               onChange={(e) => handlePriceChange(index, 'label', e.target.value)}
               placeholder="תווית מחיר"
-              
             />
           </div>
           
@@ -119,12 +120,10 @@ const PriceSelector: React.FC<PriceSelectorProps> = ({
             <button
               type="button"
               onClick={() => removePrice(index)}
-              
+              className="action-button danger"
               title="הסר מחיר"
             >
-              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-              </svg>
+              <img className='icon small' src='/assts/Icons/delete.svg' alt='מחק'/>
             </button>
           )}
         </div>
@@ -135,28 +134,27 @@ const PriceSelector: React.FC<PriceSelectorProps> = ({
         <button
           type="button"
           onClick={addPrice}
-          
+          className="action-button secondary"
         >
-          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-          </svg>
+          <img className='icon small' src='/assts/Icons/add.svg' alt='+'/>
           <span>הוסף מחיר נוסף</span>
         </button>
       )}
       
       {/* Price display preview */}
-      <div >
-        <p >תצוגה מקדימה:</p>
-        <div >
+      <div className="price-preview">
+        <p className="preview-title">תצוגה מקדימה:</p>
+        <div className="preview-prices">
           {localPrices.map((price, index) => (
             <span
               key={index}
+              className="preview-price"
             >
               ₪{price.amount.toFixed(2)}
             </span>
           ))}
         </div>
-        <p >
+        <p className="preview-note">
           המחיר הנבחר (עם הנקודה הירוקה) יוצג כמחיר הנוכחי
         </p>
       </div>

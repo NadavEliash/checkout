@@ -11,17 +11,8 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
 
   if (isLoading) {
     return (
-      <div style={{
-        minHeight: '100vh',
-        background: 'var(--gradient-app-background)',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center'
-      }}>
-        <div style={{
-          color: 'var(--color-white)',
-          fontSize: 'var(--font-xl)'
-        }}>טוען...</div>
+      <div>
+        <div>טוען...</div>
       </div>
     );
   }

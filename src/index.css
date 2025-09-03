@@ -8,8 +8,6 @@
   font-display: swap;
 }
 
-@import './styles.css';
-
 /* CSS Reset */
 * {
   margin: 0;

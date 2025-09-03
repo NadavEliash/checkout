@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { clearAllData, clearAllDataFallback, isStorageSupported } from '../utils/indexedDB';
+import './UserMenu.css';
 
 const UserMenu: React.FC = () => {
   const { user, logout } = useAuth();
@@ -11,6 +12,15 @@ const UserMenu: React.FC = () => {
   if (!user) return null;
 
   const isGuest = user.name === 'אורח';
+  
+  const getInitials = (name: string) => {
+    if (name === 'אורח') return 'א';
+    const words = name.split(' ');
+    if (words.length >= 2) {
+      return words[0].charAt(0) + words[1].charAt(0);
+    }
+    return words[0].charAt(0);
+  };
 
   const handleLogout = () => {
     setIsOpen(false);
@@ -44,57 +54,58 @@ const UserMenu: React.FC = () => {
   };
 
   return (
-    <div>
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-      >
-        {user.avatar ? (
-          <img 
-            src={user.avatar} 
-            alt={user.name} 
-          />
-        ) : (
-          <div>
-            <span>
-              {user.name === 'אורח' ? '👤' : user.name.charAt(0)}
-            </span>
-          </div>
-        )}
-        <span>{user.name}</span>
-        <svg 
-          fill="none" 
-          stroke="currentColor" 
-          viewBox="0 0 24 24"
+    <div className="dropdown-menu">
+        <button
+          onClick={() => setIsOpen(!isOpen)}
+          className="action-button secondary"
         >
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-        </svg>
-      </button>
+          {user.avatar ? (
+            <img 
+              className="avatar"
+              src={user.avatar} 
+              alt={user.name}
+              onError={(e) => {
+                const target = e.target as HTMLImageElement;
+                target.style.display = 'none';
+                const parent = target.parentElement;
+                if (parent) {
+                  parent.innerHTML = `<span class="avatar-initials">${getInitials(user.name)}</span>`;
+                }
+              }}
+            />
+          ) : (
+            <div className="avatar">
+              <span className="avatar-initials">
+                {getInitials(user.name)}
+              </span>
+            </div>
+          )}
+          <span>{user.name}</span>
+          <img className="icon small" src="/assets/Icons/arrow-down.svg" alt="v" />
+        </button>
 
-      {isOpen && (
-        <>
-          <div 
- 
-            onClick={() => setIsOpen(false)}
-          />
-          <div>
-            <div>
-              <div>
-                {user.name}
-              </div>
-              {user.email && (
-                <div>
-                  {user.email}
-                </div>
-              )}
+      <div className={`dropdown-menu-content ${isOpen ? 'open' : ''}`}>
+        <div>
+              <button
+                onClick={() => {
+                  setIsOpen(false);
+                  navigate('/user');
+                }}
+                className="dropdown-menu-item"
+              >
+                החשבון שלי
+              </button>
               {isGuest ? (
                 <>
                   <button
                     onClick={handleLogin}
+                    className="dropdown-menu-item"
                   >
                     התחבר
                   </button>
                   <button
                     onClick={handleRemoveAllData}
+                    className="dropdown-menu-item danger"
                   >
                     מחק את כל הנתונים
                   </button>
@@ -102,14 +113,13 @@ const UserMenu: React.FC = () => {
               ) : (
                 <button
                   onClick={handleLogout}
+                  className="dropdown-menu-item"
                 >
                   התנתק
                 </button>
               )}
-            </div>
-          </div>
-        </>
-      )}
+        </div>
+        </div>
     </div>
   );
 };

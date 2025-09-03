@@ -1,0 +1,102 @@
+/* Footer Styles */
+.footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--color-white-transparent);
+  border-top: 1px solid var(--color-gray-200);
+  padding: var(--spacing-lg) 0;
+  z-index: var(--z-dropdown);
+}
+
+.footer-container {
+  max-width: var(--container-lg);
+  margin: 0 auto;
+  padding: 0 var(--spacing-lg);
+}
+
+.footer-nav {
+  display: flex;
+  justify-content: center;
+  gap: var(--spacing-2xl);
+}
+
+.footer-link {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-decoration: none;
+  color: var(--color-gray-600);
+  padding: var(--spacing-md);
+  border-radius: var(--radius-md);
+  transition: all var(--transition-normal);
+  min-width: 80px;
+  position: relative;
+}
+
+.footer-link:hover {
+  color: var(--color-gray-800);
+  background: var(--color-gray-50);
+  transform: translateY(-1px);
+}
+
+/* Current page - highlighted with primary color */
+.footer-link.current {
+  color: var(--color-primary);
+  background: rgba(79, 70, 229, 0.1);
+  font-weight: var(--font-semibold);
+}
+
+.footer-link.current:hover {
+  color: var(--color-primary-hover);
+  background: rgba(79, 70, 229, 0.15);
+}
+
+/* Previous page - subtle green indication */
+.footer-link.previous {
+  color: var(--color-success);
+  background: rgba(5, 150, 105, 0.05);
+  border-left: 1px solid var(--color-success);
+}
+
+.footer-link.previous:hover {
+  color: var(--color-success-hover);
+  background: rgba(5, 150, 105, 0.1);
+  border-left-color: var(--color-success-hover);
+}
+
+/* Next page - subtle orange indication */
+.footer-link.next {
+  color: var(--color-warning);
+  background: rgba(217, 119, 6, 0.05);
+  border-right: 1px solid var(--color-warning);
+}
+
+.footer-link.next:hover {
+  color: var(--color-warning-hover);
+  background: rgba(217, 119, 6, 0.1);
+  border-right-color: var(--color-warning-hover);
+}
+
+.footer-link-text {
+  font-size: var(--font-sm);
+  font-weight: var(--font-medium);
+  text-align: center;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .footer-nav {
+    gap: var(--spacing-lg);
+  }
+  
+  .footer-link {
+    min-width: 60px;
+    padding: var(--spacing-sm);
+  }
+  
+  .footer-link-text {
+    font-size: var(--font-xs);
+  }
+}

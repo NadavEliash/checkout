@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useItems } from '../context/ItemsContext';
-import UserMenu from './UserMenu';
+import Layout from './Layout';
+import './SellPage.css';
 
 const SellPage: React.FC = () => {
   const navigate = useNavigate();
@@ -42,77 +43,68 @@ const SellPage: React.FC = () => {
   };
 
   return (
-    <div  dir="rtl">
-      <div >
-        <header >
-          <div >
-            <button
-              onClick={() => navigate('/')}
-              
-            >
-              חזור לעמוד הבית
-            </button>
-            <UserMenu />
+    <Layout>
+      <div className="sell-page">
+        <div className="sell-container">
+          <div className="page-header">
+            <h1 className="page-title">דף מכירות</h1>
+            <p className="page-description">בחר פריטים למכירה והמשך לתשלום</p>
           </div>
-          <div >
-            <h1 >דף מכירות</h1>
-            <p >בחר פריטים למכירה והמשך לתשלום</p>
-          </div>
-        </header>
 
-        <div >
-        
-          {items.length === 0 ? (
-            <div >
-              <p >אין פריטים זמינים למכירה</p>
-              <button
-                onClick={() => navigate('/create')}
-                
-              >
-                צור פריטים חדשים
-              </button>
-            </div>
-          ) : (
-            <div >
-              {items.map(item => (
-                <div key={item.id} >
-                  <input
-                    type="checkbox"
-                    checked={selectedItemIds.includes(item.id)}
-                    onChange={() => handleItemToggle(item.id)}
-                    style={{ marginLeft: '1rem', width: '1.25rem', height: '1.25rem', accentColor: '#4f46e5' }}
-                  />
-                  <div style={{ flex: 1 }}>
-                    <h3 >{item.name}</h3>
-                    <div style={{ fontSize: '0.875rem', color: '#4b5563' }}>
-                      {item.prices.map((price, index) => (
-                        <span key={index} style={{ marginLeft: '0.5rem' }}>
-                          {price.label}: ₪{price.amount}
-                        </span>
-                      ))}
+          <div className="sell-main">
+          
+            {items.length === 0 ? (
+              <div className="empty-state">
+                <p className="empty-message">בקרוב יהיו כאן פריטים</p>
+                <button
+                  onClick={() => navigate('/create')}
+                  className="action-button"
+                >
+                  צור פריטים חדשים
+                </button>
+              </div>
+            ) : (
+              <div className="items-grid">
+                {items.map(item => (
+                  <div key={item.id} className="item-card">
+                    <input
+                      type="checkbox"
+                      className="item-checkbox"
+                      checked={selectedItemIds.includes(item.id)}
+                      onChange={() => handleItemToggle(item.id)}
+                    />
+                    <div className="item-content">
+                      <h3 className="item-name">{item.name}</h3>
+                      <div className="item-prices">
+                        {item.prices.map((price, index) => (
+                          <span key={index} className="price-tag">
+                            {price.label}: ₪{price.amount}
+                          </span>
+                        ))}
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
+            )}
+          <div className="checkout-section">
+            <div className="checkout-summary">
+            <div className="total-amount">
+              סה"כ: ₪{calculateTotal()}
             </div>
-          )}
-        </div>
-
-        <div >
-          <div >
-          <div >
-            סה"כ: ₪{calculateTotal()}
+            <button
+              onClick={handleContinueToCheckout}
+              disabled={selectedItemIds.length === 0}
+              className="action-button"
+            >
+              המשך לתשלום ({selectedItemIds.length})
+            </button>
+            </div>
           </div>
-          <button
-            onClick={handleContinueToCheckout}
-            disabled={selectedItemIds.length === 0}
-          >
-            המשך לתשלום ({selectedItemIds.length})
-          </button>
           </div>
         </div>
       </div>
-    </div>
+    </Layout>
   );
 };
 

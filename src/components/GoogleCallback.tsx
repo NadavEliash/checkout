@@ -37,32 +37,10 @@ const GoogleCallback: React.FC = () => {
   }, []);
 
   return (
-    <div style={{
-      minHeight: '100vh',
-      background: 'var(--gradient-app-background)',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center'
-    }}>
-      <div style={{
-        background: 'var(--color-white-transparent)',
-        borderRadius: 'var(--radius-xl)',
-        padding: 'var(--spacing-2xl)',
-        boxShadow: 'var(--shadow-xl)',
-        textAlign: 'center'
-      }}>
-        <div style={{
-          width: 'var(--spacing-2xl)',
-          height: 'var(--spacing-2xl)',
-          border: '3px solid var(--color-gray-300)',
-          borderTop: '3px solid var(--color-primary)',
-          borderRadius: '50%',
-          animation: 'spin 1s linear infinite',
-          margin: '0 auto var(--spacing-lg)'
-        }}></div>
-        <p style={{
-          color: 'var(--color-gray-700)'
-        }}>מתחבר...</p>
+    <div>
+      <div>
+        <div></div>
+        <p>מתחבר...</p>
       </div>
     </div>
   );

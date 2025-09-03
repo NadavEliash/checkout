@@ -1,8 +1,9 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useItems } from '../context/ItemsContext';
-import UserMenu from './UserMenu';
+import Layout from './Layout';
 import PriceDisplay from './PriceDisplay';
+import './CartPage.css';
 
 const CartPage: React.FC = () => {
   const navigate = useNavigate();
@@ -18,98 +19,87 @@ const CartPage: React.FC = () => {
   };
 
   return (
-    <div  dir="rtl">
-      <div >
-        <div >
-          <div >
-            <button
-              onClick={() => navigate('/')}
-              
-            >
-              ← עמוד הבית
-            </button>
-            <button
-              onClick={handleBackToSell}
-              
-            >
-              | דף מכירות
-            </button>
+    <Layout>
+      <div className="cart-page">
+        <div className="cart-container">
+          <div className="page-header">
+            <h1 className="page-title">עגלת קניות</h1>
           </div>
-          <h1 >עגלת קניות</h1>
-          <UserMenu />
-        </div>
 
-        {cartItems.length === 0 ? (
-          <p >אין פריטים בעגלה</p>
-        ) : (
-          <div >
-            <div >
-              {cartItems.map(cartItem => (
-                <div key={cartItem.item.id} >
-                  <div >
-                    <h3 >{cartItem.item.name}</h3>
-                    <button
-                      onClick={() => removeFromCart(cartItem.item.id)}
-                      
-                      title="הסר מהעגלה"
-                    >
-                      <svg  fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                      </svg>
-                    </button>
-                  </div>
-                  
-                  <div >
-                    <PriceDisplay 
-                      prices={cartItem.item.prices}
-                      currentPrice={cartItem.item.currentPrice}
-                      size="md"
-                      showLabels={true}
-                    />
-                    <div >
-                      <button
-                        onClick={() => updateCartItemQuantity(cartItem.item.id, cartItem.quantity - 1)}
-                        
-                        disabled={cartItem.quantity <= 1}
-                      >
-                        -
-                      </button>
-                      <span >
-                        {cartItem.quantity}
-                      </span>
-                      <button
-                        onClick={() => updateCartItemQuantity(cartItem.item.id, cartItem.quantity + 1)}
-                        
-                      >
-                        +
-                      </button>
-                    </div>
-                  </div>
-                  
-                  <div >
-                    סה"כ לפריט: ₪{(cartItem.item.currentPrice * cartItem.quantity).toFixed(2)}
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            <div >
-              <div >
-                <span >סה"כ לתשלום:</span>
-                <span >₪{getTotalPrice().toFixed(2)}</span>
+          <div className="cart-main">
+            {cartItems.length === 0 ? (
+              <div className="empty-state">
+                <p className="empty-message">בקרוב יהיו כאן פריטים</p>
               </div>
-              
-              <button
-                onClick={handlePayment}
-                
-              >
-                בצע תשלום
-              </button>
-            </div>
+            ) : (
+              <div className="cart-content">
+                <div className="cart-items">
+                  {cartItems.map(cartItem => (
+                    <div key={cartItem.item.id} className="cart-item">
+                      <div className="item-header">
+                        <h3 className="item-name">{cartItem.item.name}</h3>
+                        <button
+                          onClick={() => removeFromCart(cartItem.item.id)}
+                          className="action-button danger"
+                          title="הסר מהעגלה"
+                        >
+                          <img className='icon small' src='/assets/Icons/delete.svg' alt='הסר'/>                          
+                        </button>
+                      </div>
+                      
+                      <div className="item-details">
+                        <PriceDisplay 
+                          prices={cartItem.item.prices}
+                          currentPrice={cartItem.item.currentPrice}
+                          size="md"
+                          showLabels={true}
+                        />
+                        <div className="quantity-controls">
+                          <button
+                            onClick={() => updateCartItemQuantity(cartItem.item.id, cartItem.quantity - 1)}
+                            className="action-button secondary"
+                            disabled={cartItem.quantity <= 1}
+                          >
+                            -
+                          </button>
+                          <span className="quantity-display">
+                            {cartItem.quantity}
+                          </span>
+                          <button
+                            onClick={() => updateCartItemQuantity(cartItem.item.id, cartItem.quantity + 1)}
+                            className="action-button secondary"
+                          >
+                            +
+                          </button>
+                        </div>
+                      </div>
+                      
+                      <div className="item-total">
+                        סה"כ לפריט: ₪{(cartItem.item.currentPrice * cartItem.quantity).toFixed(2)}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="checkout-section">
+                  <div className="total-summary">
+                    <span className="total-label">סה"כ לתשלום:</span>
+                    <span className="total-amount">₪{getTotalPrice().toFixed(2)}</span>
+                  </div>
+                  
+                  <button
+                    onClick={handlePayment}
+                    className="action-button"
+                  >
+                    בצע תשלום
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
-        )}
+        </div>
       </div>
-    </div>
+    </Layout>
   );
 };
 
